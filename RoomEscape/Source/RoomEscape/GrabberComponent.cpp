@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+// DO I NEED ROOMESCAPE HEADER?
 #include "GrabberComponent.h"
-
+#include "Engine/Public/DrawDebugHelpers.h"
+#define OUT
 
 // Sets default values for this component's properties
 UGrabberComponent::UGrabberComponent()
@@ -29,11 +31,41 @@ void UGrabberComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
-	// Get player view point this tick
+	/// Get player view point this tick
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewPointLocation,
+		OUT PlayerViewPointRotator
+	);
+	
+	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotator.Vector() * Reach;
 
-	// Ray-cast out to reach distance
+	//Draw a red line
+	DrawDebugLine(
+		GetWorld(),
+		PlayerViewPointLocation,
+		LineTraceEnd,
+		FColor(255, 0, 0),
+		false,
+		0.f,
+		0,
+		10.f
+	);
 
-	// See what we hit
+	/// Set up query 
+	FCollisionQueryParams TraceParameters(FName(TEXT("")), false, GetOwner());
+	/// Line-trace (aka Ray-cast) out to reach distance
+	FHitResult Hit;
+
+	GetWorld()->LineTraceSingleByObjectType(
+		OUT Hit,
+		PlayerViewPointLocation,
+		LineTraceEnd,
+		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
+		TraceParameters
+	);
+
+	/// See what we hit
+	FString ActorName = Hit.Actor->GetName();
+	UE_LOG(LogTemp, Warning, TEXT("I hit %s"), *ActorName);
 }
 
