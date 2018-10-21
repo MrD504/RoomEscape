@@ -43,6 +43,9 @@ private:
 
 	// Find (assumed) attached physics handle
 	void FindPhysicsHandleComponent();
+
+	// Get Line Trace
+	FTwoVectors GetLineTracePoints() const;
 	
 	// Setup attached input component
 	void SetupInputComponent();
