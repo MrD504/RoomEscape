@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "OpenDoor.h"
+#include "GrabberComponent.h"
+
 #include "GameFramework/Actor.h"
 
 
@@ -20,7 +22,6 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 	Owner = GetOwner();
-	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 
 }
 
@@ -43,7 +44,7 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// poll trigger vol
-	if (PressurePlate->IsOverlappingActor(ActorThatOpens))
+	if (GetTotalMassOfActorsOnPlate() > 40.f) //TODO make in to parameter
 	{
 		//if actor that opens is in volume
 		OpenDoor();
@@ -54,5 +55,10 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	if (GetWorld()->GetTimeSeconds() >= LastDoorOpenTime + DoorCloseDelay) {
 		CloseDoor();
 	}
+}
+
+float UOpenDoor::GetTotalMassOfActorsOnPlate()
+{
+	return 45.f;
 }
 
