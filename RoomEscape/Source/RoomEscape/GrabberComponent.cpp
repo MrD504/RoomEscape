@@ -68,6 +68,8 @@ void UGrabberComponent::Grab()
 	/// If we hit something then attach a physics hanle
 	if (ActorHit)
 	{
+		// check to see if physics handle is defined. Note: always do this or you will get major crash
+		if (!PhysicsHandle) return;
 		PhysicsHandle->GrabComponentAtLocation(
 			ComponentToGrab, 
 			NAME_None, //No bones needed
@@ -79,6 +81,8 @@ void UGrabberComponent::Grab()
 void UGrabberComponent::Release()
 {
 	// release physics handle
+	// check to see if physics handle is defined. Note: always do this or you will get major crash
+	if (!PhysicsHandle) return;
 	PhysicsHandle->ReleaseComponent();
 }
 
@@ -88,7 +92,6 @@ void UGrabberComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
 	if (!PhysicsHandle) { return; }
-
 	if (PhysicsHandle->GetGrabbedComponent())
 	{
 		PhysicsHandle->SetTargetLocation(GetLineTracePoints().v2);
