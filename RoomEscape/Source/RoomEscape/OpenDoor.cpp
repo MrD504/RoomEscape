@@ -31,20 +31,6 @@ void UOpenDoor::BeginPlay()
 
 }
 
-void UOpenDoor::OpenDoor()
-{
-	//Set the door rotation
-	if (!Owner) return;
-	Owner->SetActorRotation(FRotator(0.f, OpenAngle, 0.f));
-}
-
-void UOpenDoor::CloseDoor()
-{
-	//Set the door rotation
-	if (!Owner) return;
-	Owner->SetActorRotation(FRotator(0.f, CloseAngle, 0.f));
-}
-
 
 // Called every frame
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -52,16 +38,13 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// poll trigger vol
-	if (GetTotalMassOfActorsOnPlate() > 40.f) //TODO make in to parameter
+	if (GetTotalMassOfActorsOnPlate() > TriggerMass) //TODO make in to parameter
 	{
 		//if actor that opens is in volume
-		OpenDoor();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		OnOpen.Broadcast();
 	}
-
-	// check if its time to close the door
-	if (GetWorld()->GetTimeSeconds() >= LastDoorOpenTime + DoorCloseDelay) {
-		CloseDoor();
+	else {
+		OnClose.Broadcast();
 	}
 }
 
@@ -76,7 +59,7 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate()
 	// Iterate through add masses
 
 	// Ignore errors, seem to be IDE errors rather than breaking errors
-	for (const auto* Actor : OverlappingActors)
+	for (const auto& Actor : OverlappingActors)
 	{
 		totalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
 	}
